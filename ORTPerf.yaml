@@ -1,21 +1,29 @@
 defaults:
-  - backend: pytorch
-  - launcher: process
-  - benchmark: inference
+  - backend: onnxruntime # default backend
+  - launcher: torchrun # default launcher
+  - benchmark: inference # default benchmark
   - experiment # inheriting experiment schema
   - _self_ # for hydra 1.1 compatibility
   - override hydra/job_logging: colorlog # colorful logging
   - override hydra/hydra_logging: colorlog # colorful logging
 
-experiment_name: pytorch_bert
-
-benchmark:
-  latency: true
-  memory: true
+experiment_name: onnxruntime_llama
 
 backend:
   device: cuda
-  model: bert-base-uncased
+  device_ids: 0
+  no_weights: true
+  model: meta-llama/Llama-2-7b-hf
+
+launcher:
+  device_isolation: true
+  nproc_per_node: 4
+
+benchmark:
+  input_shapes:
+    batch_size: 1
+    sequence_length: 256
+  new_tokens: 1000
 
 # hydra/cli specific settings
 hydra:
